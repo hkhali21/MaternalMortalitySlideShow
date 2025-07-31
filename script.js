@@ -261,7 +261,7 @@ function drawScene2() {
     </p>
   `);
 
-  d3.csv("global_mmr_from_clean.csv").then(data => {
+  d3.csv("global_mmr_cleaned.csv").then(data => {
     data.forEach(d => {
       d.year = +d.year;
       d.global_mmr = +d.global_mmr;
