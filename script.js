@@ -237,11 +237,11 @@ bubbles
 }
 
 function drawScene2() {
-  d3.select("#description").html(`
+  d3.select("#description").classed("visible", true).html(`
     <h2>Scene 2: Global Maternal Mortality Over Time</h2>
     <p>
       This line chart shows how the global <strong>Maternal Mortality Ratio (MMR)</strong> has changed over time.
-      The chart reveals overall progress (or lack thereof) across the decades.
+      It helps us see whether the world is making progress or falling behind.
     </p>
   `);
 
@@ -253,7 +253,7 @@ function drawScene2() {
 
     const x = d3.scaleLinear()
       .domain(d3.extent(data, d => d.year))
-      .range([80, width - 80]);
+      .range([60, width - 60]);
 
     const y = d3.scaleLinear()
       .domain([0, d3.max(data, d => d.global_mmr)]).nice()
@@ -276,6 +276,17 @@ function drawScene2() {
       .duration(2000)
       .attr("stroke-dashoffset", 0);
 
+    // X Axis
+    svg.append("g")
+      .attr("transform", `translate(0, ${height - 50})`)
+      .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+    // Y Axis
+    svg.append("g")
+      .attr("transform", `translate(60, 0)`)
+      .call(d3.axisLeft(y));
+
+    // Axis Labels
     svg.append("text")
       .attr("x", width / 2)
       .attr("y", height - 10)
@@ -284,9 +295,9 @@ function drawScene2() {
       .text("Year");
 
     svg.append("text")
-      .attr("transform", "rotate(-90)")
       .attr("x", -height / 2)
       .attr("y", 20)
+      .attr("transform", "rotate(-90)")
       .attr("text-anchor", "middle")
       .style("font-weight", "bold")
       .text("Global Maternal Mortality Ratio");
