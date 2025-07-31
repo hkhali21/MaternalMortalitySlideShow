@@ -63,10 +63,13 @@ const xScale = d3.scalePoint()
     .join("circle")
     .attr("cx", d => xScale(d.income))
     .attr("cy", height - 50)
-    .attr("r", d => Math.sqrt(d.births) / 200)
+    .attr("r", d => {
+      const r = Math.sqrt(d.births) / 200;
+      return (d.country === "Norway" || d.country === "Nigeria") ? Math.max(r, 7) : r;
+    })
     .attr("fill", d => {
       if (d.country === "Nigeria") return "crimson";
-      if (d.country === "Norway") return "darkblue";
+      if (d.country === "Norway") return "#0077FF";
       return "#89CFF0";
     })
     .attr("opacity", 0.8);
@@ -157,7 +160,7 @@ const xScale = d3.scalePoint()
   const legendData = [
     { label: "Other Countries", color: "#89CFF0" },
     { label: "Nigeria", color: "crimson" },
-    { label: "Norway", color: "darkblue" }
+    { label: "Norway", color: "#0077FF" }
   ];
 
   svg.selectAll("legend-dots")
