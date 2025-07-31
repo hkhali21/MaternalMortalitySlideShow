@@ -125,7 +125,15 @@ function drawScene1() {
     .attr("text-anchor", "start")
     .style("alignment-baseline", "middle");
 
-  // Set description with visible class
+  
+  svg.append("text")
+    .attr("x", -height / 2)
+    .attr("y", 20)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .text("Maternal Mortality Ratio (MMR)");
+// Set description with visible class
   d3.select("#description")
     .classed("visible", true)
     .html(`
