@@ -75,57 +75,59 @@ const xScale = d3.scalePoint()
     .duration(2000)
     .attr("cy", d => yScale(d.mmr))
 
+
 .on("end", function (event, d) {
   if (d.country === "Nigeria" || d.country === "Norway") {
     const x = xScale(d.income);
     const y = yScale(d.mmr);
-    const pulseColor = d.country === "Nigeria" ? "crimson" : "#1E90FF";
+    const baseColor = d.country === "Nigeria" ? "crimson" : "#1E90FF";
     const labelColor = d.country === "Nigeria" ? "crimson" : "#003366";
 
-    // Persistent visible ring
+    // Glowing base circle
     svg.append("circle")
       .attr("cx", x)
       .attr("cy", y)
-      .attr("r", Math.max(Math.sqrt(d.births) / 200 + 6, 8))
-      .attr("fill", "none")
-      .attr("stroke", pulseColor)
-      .attr("stroke-width", 2)
-      .attr("opacity", 0.8);
+      .attr("r", Math.max(Math.sqrt(d.births) / 200 + 6, 10))
+      .attr("fill", baseColor)
+      .style("filter", "url(#glow)");
 
-    // Repeating pulse animation
-    const pulse = svg.append("circle")
-      .attr("cx", x)
-      .attr("cy", y)
-      .attr("r", Math.sqrt(d.births) / 200 + 6)
-      .attr("fill", "none")
-      .attr("stroke", pulseColor)
-      .attr("stroke-width", 2)
-      .attr("opacity", 0.4);
+    // Flare pulse ring
+    function flare() {
+      const ring = svg.append("circle")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", 8)
+        .attr("stroke", baseColor)
+        .attr("stroke-width", 2)
+        .attr("fill", "none")
+        .attr("opacity", 0.6);
 
-    function animatePulse() {
-      pulse
-        .attr("r", Math.sqrt(d.births) / 200 + 6)
-        .attr("opacity", 0.4)
-        .transition()
-        .duration(1200)
-        .attr("r", Math.sqrt(d.births) / 200 + 14)
+      ring.transition()
+        .duration(1500)
+        .attr("r", 20)
         .attr("opacity", 0)
-        .on("end", animatePulse);
+        .remove()
+        .on("end", flare);
     }
 
-    animatePulse();
+    flare();
 
-    // Label
+    // Fade-in country label
     svg.append("text")
       .attr("x", x)
-      .attr("y", y - 12)
+      .attr("y", y - 14)
       .attr("text-anchor", "middle")
       .style("font-size", "13px")
       .style("font-weight", "bold")
       .style("fill", labelColor)
-      .text(d.country);
+      .style("opacity", 0)
+      .text(d.country)
+      .transition()
+      .duration(800)
+      .style("opacity", 1);
   }
 })
+
 ;
   
   // Axis labels
