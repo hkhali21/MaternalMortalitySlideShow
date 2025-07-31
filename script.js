@@ -291,13 +291,21 @@ function drawScene2() {
       .attr("text-anchor", "middle")
       .style("font-weight", "bold")
       .text("Global Maternal Mortality Ratio");
-
-    d3.select("#description").html(`
-      <h2>Scene 2: Global Maternal Mortality Over Time</h2>
-      <p>
-        This line chart shows how the global <strong>Maternal Mortality Ratio (MMR)</strong> has changed over the years.
-        A downward trend indicates improvements in maternal healthcare globally.
-      </p>
+    d3.select("#description")
+      .classed("visible", true)
+      .html(`
+        <h2>Global Trends in Maternal Mortality</h2>
+        <p>
+          While Scene 1 illustrated the sharp contrast in maternal mortality across income groups for a single year, 
+          this scene zooms out to examine the <strong>global trend over time</strong>.
+          Tracking the <strong>Maternal Mortality Ratio (MMR)</strong> from 2000 onward, we can see whether 
+          healthcare improvements are reducing maternal deaths worldwide.
+        </p>
+        <p>
+          Encouragingly, the chart shows a general <strong>downward trend</strong>, suggesting that 
+          global efforts in maternal health — including increased access to skilled birth attendants, 
+          emergency obstetric care, and education — are making a measurable impact.
+        </p>
     `);
   });
 }
