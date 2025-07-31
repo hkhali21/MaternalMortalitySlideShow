@@ -144,7 +144,7 @@ const xScale = d3.scalePoint()
   xScale.domain().forEach(group => {
     svg.append("text")
       .attr("x", xScale(group))
-      .attr("y", height - 55)
+      .attr("y", height - 30)
       .attr("text-anchor", "middle")
       .style("font-size", "12px")
       .text(group);
