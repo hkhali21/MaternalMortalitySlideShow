@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,6 @@
 </head>
 <body>
 
-<!-- Progress Navigation Bar -->
 <div class="progress-container">
   <ul class="progressbar">
     <li class="step active">1</li>
@@ -22,134 +22,17 @@
   </div>
 </div>
 
-<style>
-.progress-container {
-  width: 100%;
-  margin: 30px auto;
-  text-align: center;
-  font-family: sans-serif;
-}
+<h1>Maternal Mortality and Poverty</h1>
+<div id="slideshow">
+  <button id="prev">⟵ Back</button>
+  <button id="next">Next ⟶</button>
+</div>
 
-.progressbar {
-  counter-reset: step;
-  display: flex;
-  justify-content: center;
-  list-style-type: none;
-  margin-bottom: 20px;
-  padding-left: 0;
-}
+<div class="viz-container">
+  <svg id="chart" width="600" height="500"></svg>
+  <div id="description" class="description-box"></div>
+</div>
 
-.progressbar .step {
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  border: 2px solid #3498db;
-  border-radius: 50%;
-  background-color: white;
-  color: #3498db;
-  margin: 0 15px;
-  font-weight: bold;
-  position: relative;
-  z-index: 1;
-}
-
-.progressbar .step.active {
-  background-color: #3498db;
-  color: white;
-}
-
-.progressbar .step::before,
-.progressbar .step::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 60px;
-  height: 2px;
-  background-color: #3498db;
-  z-index: 0;
-}
-
-.progressbar .step::before {
-  left: -60px;
-}
-
-.progressbar .step::after {
-  right: -60px;
-}
-
-.progressbar .step:first-child::before {
-  display: none;
-}
-
-.progressbar .step:last-child::after {
-  display: none;
-}
-
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.button-group button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #3498db;
-  color: white;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.button-group button:hover {
-  background-color: #2980b9;
-}
-</style>
-
-<script>
-let currentStep = 1;
-const totalSteps = 4;
-
-function updateProgressBar(step) {
-  const steps = document.querySelectorAll(".progressbar .step");
-  steps.forEach((el, index) => {
-    if (index < step) {
-      el.classList.add("active");
-    } else {
-      el.classList.remove("active");
-    }
-  });
-}
-
-document.getElementById("prevBtn").addEventListener("click", () => {
-  if (currentStep > 1) {
-    currentStep--;
-    updateProgressBar(currentStep);
-    showScene(currentStep);
-  }
-});
-
-document.getElementById("nextBtn").addEventListener("click", () => {
-  if (currentStep < totalSteps) {
-    currentStep++;
-    updateProgressBar(currentStep);
-    showScene(currentStep);
-  }
-});
-</script>
-
-  <h1>Maternal Mortality and Poverty</h1>
-  <div id="slideshow">
-    <button id="prev">⟵ Back</button>
-    <button id="next">Next ⟶</button>
-  </div>
-  
-  
-  <div class="viz-container">
-    <svg id="chart" width="700" height="500"></svg>
-    <div id="description" class="description-box"></div>
-  </div>
-        
-  <script src="script.js"></script>
-</body>Open in Browser
+<script src="script.js"></script>
+</body>
 </html>
