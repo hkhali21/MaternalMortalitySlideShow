@@ -153,6 +153,18 @@ function drawScene1() {
       .text(d => d.label)
       .attr("text-anchor", "start")
       .style("alignment-baseline", "middle");
+
+    // add description
+    const desc = d3.select("#description");
+    desc.classed("visible", true).html(`
+      <h2>Understanding Maternal Mortality & Income</h2>
+      <p>
+        This scene presents a bubble chart showing the <strong>Maternal Mortality Ratio (MMR)</strong> across different <strong>income groups</strong>.
+        Each bubble represents a country, sized by the number of <strong>live births</strong>.
+        Countries like <span style='color:crimson; font-weight:bold;'>Nigeria</span> show high MMR despite many births,
+        while <span style='color:green; font-weight:bold;'>Norway</span> has low MMR, reflecting the disparities in healthcare outcomes.
+      </p>
+    `);
   }
 
 function drawScene2() {
