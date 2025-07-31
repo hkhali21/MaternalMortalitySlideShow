@@ -74,6 +74,37 @@ const xScale = d3.scalePoint()
     })
     .attr("opacity", 0.8);
 
+// Create tooltip
+const tooltip = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("background", "#fff")
+  .style("padding", "8px")
+  .style("border", "1px solid #ccc")
+  .style("border-radius", "4px")
+  .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)")
+  .style("pointer-events", "none")
+  .style("opacity", 0);
+
+// Add tooltip events
+bubbles
+  .on("mouseover", (event, d) => {
+    tooltip.transition().duration(200).style("opacity", 1);
+    tooltip.html(`<strong>${d.country}</strong><br>MMR: ${d.mmr}`)
+      .style("left", (event.pageX + 15) + "px")
+      .style("top", (event.pageY - 28) + "px");
+  })
+  .on("mousemove", event => {
+    tooltip
+      .style("left", (event.pageX + 15) + "px")
+      .style("top", (event.pageY - 28) + "px");
+  })
+  .on("mouseout", () => {
+    tooltip.transition().duration(300).style("opacity", 0);
+  });
+
+
   bubbles.transition()
     .duration(2000)
     .attr("cy", d => yScale(d.mmr))
