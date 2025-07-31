@@ -224,12 +224,12 @@ function drawScene3() {
     .text(d => `${d.country}: ${(d.mmr * 100000).toFixed(0)}`);
 }
 
-d3.select("#next").on("click", () => {
+d3.select("#nextBtn").on("click", () => {
   currentScene = (currentScene + 1) % 3;
   updateScene();
 });
 
-d3.select("#prev").on("click", () => {
+d3.select("#prevBtn").on("click", () => {
   currentScene = (currentScene - 1 + 3) % 3;
   updateScene();
 });
