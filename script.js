@@ -237,58 +237,48 @@ bubbles
 }
 
 function drawScene2() {
-  d3.select("#description").classed("visible", true).html(`
-    <h2>Scene 2: Global Maternal Mortality Over Time</h2>
-    <p>
-      This line chart shows how the global <strong>Maternal Mortality Ratio (MMR)</strong> has changed over time.
-      It helps us see whether the world is making progress or falling behind.
-    </p>
-  `);
+  
+  d3.csv("global_mmr_cleaned.csv").then(raw => {
+    const parsedData = raw.map(d => ({
+      year: +d.Year,
+      mmr: +d.Global_MMR
+    })).sort((a, b) => a.year - b.year);
 
-  d3.csv("global_mmr_cleaned.csv").then(data => {
-    data.forEach(d => {
-      d.year = +d.year;
-      d.global_mmr = +d.global_mmr;
-    });
+    const margin = { top: 50, right: 20, bottom: 50, left: 60 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
 
     const x = d3.scaleLinear()
-      .domain(d3.extent(data, d => d.year))
-      .range([60, width - 60]);
+      .domain(d3.extent(parsedData, d => d.year))
+      .range([0, innerWidth]);
 
     const y = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.global_mmr)]).nice()
-      .range([height - 50, 50]);
+      .domain([0, d3.max(parsedData, d => d.mmr)]).nice()
+      .range([innerHeight, 0]);
 
     const line = d3.line()
       .x(d => x(d.year))
-      .y(d => y(d.global_mmr))
+      .y(d => y(d.mmr))
       .curve(d3.curveMonotoneX);
 
-    svg.append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "#007acc")
-      .attr("stroke-width", 3)
-      .attr("d", line)
-      .attr("stroke-dasharray", function () { return this.getTotalLength(); })
-      .attr("stroke-dashoffset", function () { return this.getTotalLength(); })
-      .transition()
-      .duration(2000)
-      .attr("stroke-dashoffset", 0);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // X Axis
-    svg.append("g")
-      .attr("transform", `translate(0, ${height - 50})`)
+    g.append("path")
+      .datum(parsedData)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", line);
+
+    g.append("g")
+      .attr("transform", `translate(0,${innerHeight})`)
       .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
-    // Y Axis
-    svg.append("g")
-      .attr("transform", `translate(60, 0)`)
+    g.append("g")
       .call(d3.axisLeft(y));
 
-    // Axis Labels
     svg.append("text")
-      .attr("x", width / 2)
+      .attr("x", margin.left + innerWidth / 2)
       .attr("y", height - 10)
       .attr("text-anchor", "middle")
       .style("font-weight", "bold")
@@ -301,6 +291,14 @@ function drawScene2() {
       .attr("text-anchor", "middle")
       .style("font-weight", "bold")
       .text("Global Maternal Mortality Ratio");
+
+    d3.select("#description").html(`
+      <h2>Scene 2: Global Maternal Mortality Over Time</h2>
+      <p>
+        This line chart shows how the global <strong>Maternal Mortality Ratio (MMR)</strong> has changed over the years.
+        A downward trend indicates improvements in maternal healthcare globally.
+      </p>
+    `);
   });
 }
 
