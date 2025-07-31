@@ -37,6 +37,19 @@ function drawScene1() {
     .append("feGaussianBlur")
     .attr("stdDeviation", "3.5")
     .attr("result", "coloredBlur");
+  const defs = svg.append("defs");
+  defs.append("marker")
+    .attr("id", "arrow")
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 5)
+    .attr("refY", 0)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .attr("fill", "#333");
+
 const xScale = d3.scalePoint()
     .domain(["Low income", "Lower middle income", "Upper middle income", "High income"])
     .range([100, width - 100]);
@@ -97,6 +110,62 @@ const xScale = d3.scalePoint()
     .style("stroke-width", 2)
     .style("stroke-opacity", 0.6)
     .style("filter", "url(#glow)");
+  // Add annotation arrows and boxes for Nigeria and Norway
+  highlighted.forEach(d => {
+    const x = xScale(d.income);
+    const y = yScale(d.mmr);
+
+    // Annotation text
+    const annotationText = `${d.country}: ${d.mmr}`;
+
+    // Create temporary text to measure width
+    const tempText = svg.append("text")
+      .attr("x", -9999)
+      .attr("y", -9999)
+      .style("font-size", "13px")
+      .text(annotationText);
+
+    const textWidth = tempText.node().getBBox().width;
+    tempText.remove();
+
+    const boxWidth = textWidth + 12;
+    const boxHeight = 22;
+    const offsetX = 20;
+    const offsetY = -30;
+
+    // Draw arrow line
+    svg.append("line")
+      .attr("x1", x)
+      .attr("y1", y)
+      .attr("x2", x + offsetX)
+      .attr("y2", y + offsetY + boxHeight / 2)
+      .attr("stroke", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .attr("stroke-width", 1.5)
+      .attr("marker-end", "url(#arrow)");
+
+    // Draw annotation background box
+    svg.append("rect")
+      .attr("x", x + offsetX)
+      .attr("y", y + offsetY)
+      .attr("width", boxWidth)
+      .attr("height", boxHeight)
+      .attr("rx", 6)
+      .attr("ry", 6)
+      .attr("fill", "white")
+      .attr("stroke", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .attr("stroke-width", 1.5)
+      .style("filter", "drop-shadow(0px 1px 3px rgba(0,0,0,0.2))");
+
+    // Add annotation text
+    svg.append("text")
+      .attr("x", x + offsetX + 6)
+      .attr("y", y + offsetY + 15)
+      .style("font-size", "13px")
+      .style("font-weight", "bold")
+      .style("fill", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .text(annotationText);
+  });
+
 
   svg.selectAll(".annotation")
     .data(highlighted)
