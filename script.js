@@ -31,7 +31,13 @@ function updateScene() {
 }
 
 function drawScene1() {
-  const xScale = d3.scalePoint()
+  
+  svg.append("defs").append("filter")
+    .attr("id", "glow")
+    .append("feGaussianBlur")
+    .attr("stdDeviation", "3.5")
+    .attr("result", "coloredBlur");
+const xScale = d3.scalePoint()
     .domain(["Low income", "Lower middle income", "Upper middle income", "High income"])
     .range([100, width - 100]);
 
@@ -75,6 +81,35 @@ function drawScene1() {
           .style("top", (yScale(d.mmr) - 30) + "px");
       }
     });
+  // Highlight with flare and annotation for Nigeria and Norway
+  const highlighted = data.filter(d => d.country === "Nigeria" || d.country === "Norway");
+
+  const flare = svg.selectAll(".flare")
+    .data(highlighted)
+    .enter()
+    .append("circle")
+    .attr("class", "flare")
+    .attr("cx", d => xScale(d.income))
+    .attr("cy", d => yScale(d.mmr))
+    .attr("r", d => Math.sqrt(d.births) / 200 + 6)
+    .style("fill", "none")
+    .style("stroke", d => d.country === "Nigeria" ? "crimson" : "darkblue")
+    .style("stroke-width", 2)
+    .style("stroke-opacity", 0.6)
+    .style("filter", "url(#glow)");
+
+  svg.selectAll(".annotation")
+    .data(highlighted)
+    .enter()
+    .append("text")
+    .attr("class", "annotation")
+    .attr("x", d => xScale(d.income) + 12)
+    .attr("y", d => yScale(d.mmr) - 12)
+    .style("font-size", "13px")
+    .style("font-weight", "bold")
+    .style("fill", d => d.country === "Nigeria" ? "crimson" : "darkblue")
+    .text(d => `${d.country}: ${d.mmr}`);
+
 
   // Axis labels
   svg.append("text")
