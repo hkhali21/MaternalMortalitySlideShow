@@ -30,6 +30,7 @@ function updateScene() {
 
 
 
+
 function drawScene1() {
   const xScale = d3.scalePoint()
     .domain(["Low income", "Lower middle income", "Upper middle income", "High income"])
@@ -62,7 +63,7 @@ function drawScene1() {
     .attr("fill", d => {
       if (d.country === "Nigeria") return "crimson";
       if (d.country === "Norway") return "green";
-      return "steelblue";
+      return "#8888ff";  // lighter color for visibility
     })
     .attr("opacity", 0.7)
     .on("mouseover", function (event, d) {
@@ -80,7 +81,7 @@ function drawScene1() {
     .duration(1000)
     .attr("cy", d => yScale(d.mmr));
 
-  // Axis labels only (no ticks or lines)
+  // Axis labels
   svg.append("text")
     .attr("x", width / 2)
     .attr("y", height - 10)
@@ -96,6 +97,16 @@ function drawScene1() {
     .style("font-weight", "bold")
     .text("Maternal Mortality Ratio");
 
+  // Show x-axis category labels manually
+  xScale.domain().forEach((group, i) => {
+    svg.append("text")
+      .attr("x", xScale(group))
+      .attr("y", height - 55)
+      .attr("text-anchor", "middle")
+      .style("font-size", "12px")
+      .text(group);
+  });
+
   // Title
   svg.append("text")
     .attr("x", width / 2)
@@ -106,7 +117,7 @@ function drawScene1() {
 
   // Legend
   const legendData = [
-    { label: "Other Countries", color: "steelblue" },
+    { label: "Other Countries", color: "#8888ff" },
     { label: "Nigeria", color: "crimson" },
     { label: "Norway", color: "green" }
   ];
