@@ -76,10 +76,7 @@ const xScale = d3.scalePoint()
     .attr("cy", d => yScale(d.mmr))
 .on("end", function (event, d) {
   if (d.country === "Nigeria" || d.country === "Norway") {
-    tooltip.transition().duration(200).style("opacity", 1);
-    tooltip.html(`<strong>${d.country}</strong><br>MMR: ${d.mmr}`)
-      .style("left", (xScale(d.income) + 30) + "px")
-      .style("top", (yScale(d.mmr) - 30) + "px");
+    
 
     svg.append("text")
       .attr("x", xScale(d.income))
@@ -89,7 +86,33 @@ const xScale = d3.scalePoint()
       .style("font-weight", "bold")
       .style("fill", d.country === "Nigeria" ? "crimson" : "darkblue")
       .text(d.country);
-  }
+  
+    svg.append("circle")
+      .attr("cx", xScale(d.income))
+      .attr("cy", yScale(d.mmr))
+      .attr("r", Math.sqrt(d.births) / 200 + 6)
+      .attr("fill", "none")
+      .attr("stroke", d.country === "Nigeria" ? "crimson" : "deepskyblue")
+      .attr("stroke-width", 2)
+      .attr("opacity", 0.6)
+      .transition()
+      .duration(1000)
+      .attr("stroke-width", 5)
+      .attr("opacity", 0.1)
+      .transition()
+      .duration(1000)
+      .attr("stroke-width", 2)
+      .attr("opacity", 0.6);
+
+    svg.append("text")
+      .attr("x", xScale(d.income))
+      .attr("y", yScale(d.mmr) - 12)
+      .attr("text-anchor", "middle")
+      .style("font-size", "13px")
+      .style("font-weight", "bold")
+      .style("fill", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .text(d.country);
+}
 });
   
   // Axis labels
