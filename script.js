@@ -74,46 +74,59 @@ const xScale = d3.scalePoint()
   bubbles.transition()
     .duration(2000)
     .attr("cy", d => yScale(d.mmr))
+
 .on("end", function (event, d) {
   if (d.country === "Nigeria" || d.country === "Norway") {
-    
+    const x = xScale(d.income);
+    const y = yScale(d.mmr);
+    const pulseColor = d.country === "Nigeria" ? "crimson" : "#1E90FF";
+    const labelColor = d.country === "Nigeria" ? "crimson" : "#003366";
 
-    svg.append("text")
-      .attr("x", xScale(d.income))
-      .attr("y", yScale(d.mmr) - 12)
-      .attr("text-anchor", "middle")
-      .style("font-size", "13px")
-      .style("font-weight", "bold")
-      .style("fill", d.country === "Nigeria" ? "crimson" : "darkblue")
-      .text(d.country);
-  
+    // Persistent visible ring
     svg.append("circle")
-      .attr("cx", xScale(d.income))
-      .attr("cy", yScale(d.mmr))
+      .attr("cx", x)
+      .attr("cy", y)
+      .attr("r", Math.max(Math.sqrt(d.births) / 200 + 6, 8))
+      .attr("fill", "none")
+      .attr("stroke", pulseColor)
+      .attr("stroke-width", 2)
+      .attr("opacity", 0.8);
+
+    // Repeating pulse animation
+    const pulse = svg.append("circle")
+      .attr("cx", x)
+      .attr("cy", y)
       .attr("r", Math.sqrt(d.births) / 200 + 6)
       .attr("fill", "none")
-      .attr("stroke", d.country === "Nigeria" ? "crimson" : "deepskyblue")
+      .attr("stroke", pulseColor)
       .attr("stroke-width", 2)
-      .attr("opacity", 0.6)
-      .transition()
-      .duration(1000)
-      .attr("stroke-width", 5)
-      .attr("opacity", 0.1)
-      .transition()
-      .duration(1000)
-      .attr("stroke-width", 2)
-      .attr("opacity", 0.6);
+      .attr("opacity", 0.4);
 
+    function animatePulse() {
+      pulse
+        .attr("r", Math.sqrt(d.births) / 200 + 6)
+        .attr("opacity", 0.4)
+        .transition()
+        .duration(1200)
+        .attr("r", Math.sqrt(d.births) / 200 + 14)
+        .attr("opacity", 0)
+        .on("end", animatePulse);
+    }
+
+    animatePulse();
+
+    // Label
     svg.append("text")
-      .attr("x", xScale(d.income))
-      .attr("y", yScale(d.mmr) - 12)
+      .attr("x", x)
+      .attr("y", y - 12)
       .attr("text-anchor", "middle")
       .style("font-size", "13px")
       .style("font-weight", "bold")
-      .style("fill", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .style("fill", labelColor)
       .text(d.country);
-}
-});
+  }
+})
+;
   
   // Axis labels
   svg.append("text")
