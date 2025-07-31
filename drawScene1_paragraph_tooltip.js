@@ -1,6 +1,6 @@
 
 function drawScene1() {
-  // Clear previous text
+  // Clear previous text now
   d3.select("#description").html(`
     <h2>Scene 1: Maternal Mortality vs. Income Group</h2>
     <p>
