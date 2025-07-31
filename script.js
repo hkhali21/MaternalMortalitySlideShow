@@ -28,39 +28,132 @@ function updateScene() {
   }
 }
 
+
 function drawScene1() {
-  const xScale = d3.scalePoint()
-    .domain(["Low income", "Lower middle income", "Upper middle income", "High income"])
-    .range([100, width - 100]);
-
-  const yScale = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.mmr)]).nice()
-    .range([height - 50, 50]);
-
-  svg.selectAll("circle")
-    .data(data)
-    .join("circle")
-    .attr("cx", d => xScale(d.income))
-    .attr("cy", d => yScale(d.mmr))
-    .attr("r", d => Math.sqrt(d.births) / 200)
-    .attr("fill", "steelblue")
-    .attr("opacity", 0.7);
-
-  svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", 30)
-    .attr("text-anchor", "middle")
-    .text("Scene 1: MMR vs Income Group");
-
-  svg.selectAll("text.label")
-    .data(xScale.domain())
-    .join("text")
-    .attr("class", "label")
-    .attr("x", d => xScale(d))
-    .attr("y", height - 10)
-    .text(d => d)
-    .attr("text-anchor", "middle");
-}
+    const xScale = d3.scalePoint()
+      .domain(["Low income", "Lower middle income", "Upper middle income", "High income"])
+      .range([100, width - 100]);
+  
+    const yScale = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.mmr)]).nice()
+      .range([height - 50, 50]);
+  
+    // Add axes
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+  
+    svg.append("g")
+      .attr("transform", `translate(0, ${height - 50})`)
+      .call(xAxis);
+  
+    svg.append("g")
+      .attr("transform", `translate(100, 0)`)
+      .call(yAxis);
+  
+    // Axis labels
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 10)
+      .attr("text-anchor", "middle")
+      .text("Income Group");
+  
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -height / 2)
+      .attr("y", 20)
+      .attr("text-anchor", "middle")
+      .text("Maternal Mortality Ratio");
+  
+    // Draw bubbles with color condition
+    svg.selectAll("circle")
+      .data(data)
+      .join("circle")
+      .attr("cx", d => xScale(d.income))
+      .attr("cy", height - 50)
+      .attr("r", d => Math.sqrt(d.births) / 200)
+      .attr("fill", d => {
+        if (d.country === "Nigeria") return "crimson";
+        if (d.country === "Norway") return "green";
+        return "steelblue";
+      })
+      .attr("opacity", 0.7)
+      .transition()
+      .duration(1000)
+      .attr("cy", d => yScale(d.mmr));
+  
+    // Title
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", 30)
+      .attr("text-anchor", "middle")
+      .text("Scene 1: MMR vs Income Group");
+  
+    // Annotation: Nigeria
+    const nigeria = data.find(d => d.country === "Nigeria");
+    if (nigeria) {
+      svg.append("text")
+        .attr("x", xScale(nigeria.income))
+        .attr("y", yScale(nigeria.mmr) - 15)
+        .attr("text-anchor", "middle")
+        .attr("fill", "black")
+        .style("font-weight", "bold")
+        .text("🇳🇬 Nigeria");
+  
+      svg.append("line")
+        .attr("x1", xScale(nigeria.income))
+        .attr("y1", yScale(nigeria.mmr))
+        .attr("x2", xScale(nigeria.income))
+        .attr("y2", yScale(nigeria.mmr) - 10)
+        .attr("stroke", "black")
+        .attr("stroke-dasharray", "3,3");
+    }
+  
+    // Annotation: Norway
+    const norway = data.find(d => d.country === "Norway");
+    if (norway) {
+      svg.append("text")
+        .attr("x", xScale(norway.income))
+        .attr("y", yScale(norway.mmr) - 15)
+        .attr("text-anchor", "middle")
+        .attr("fill", "black")
+        .style("font-weight", "bold")
+        .text("🇳🇴 Norway");
+  
+      svg.append("line")
+        .attr("x1", xScale(norway.income))
+        .attr("y1", yScale(norway.mmr))
+        .attr("x2", xScale(norway.income))
+        .attr("y2", yScale(norway.mmr) - 10)
+        .attr("stroke", "black")
+        .attr("stroke-dasharray", "3,3");
+    }
+  
+    // Add legend
+    const legendData = [
+      { label: "Other Countries", color: "steelblue" },
+      { label: "Nigeria", color: "crimson" },
+      { label: "Norway", color: "green" }
+    ];
+  
+    svg.selectAll("legend-dots")
+      .data(legendData)
+      .enter()
+      .append("circle")
+      .attr("cx", width - 180)
+      .attr("cy", (d, i) => 60 + i * 20)
+      .attr("r", 6)
+      .style("fill", d => d.color);
+  
+    svg.selectAll("legend-labels")
+      .data(legendData)
+      .enter()
+      .append("text")
+      .attr("x", width - 165)
+      .attr("y", (d, i) => 65 + i * 20)
+      .text(d => d.label)
+      .attr("text-anchor", "start")
+      .style("alignment-baseline", "middle");
+  }
 
 function drawScene2() {
   const regionalData = data.filter(d => d.region.includes("Sub-Saharan"));
