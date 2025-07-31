@@ -58,112 +58,128 @@ const xScale = d3.scalePoint()
     .domain([0, d3.max(data, d => d.mmr)]).nice()
     .range([height - 50, 50]);
 
-    const bubbles = svg.selectAll("circle")
+  const tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("position", "absolute")
+    .style("background", "#fff")
+    .style("padding", "8px")
+    .style("border", "1px solid #ccc")
+    .style("border-radius", "4px")
+    .style("box-shadow", "0 0 10px rgba(0,0,0,0.2)")
+    .style("pointer-events", "none")
+    .style("opacity", 0);
+
+  const bubbles = svg.selectAll("circle")
     .data(data)
     .join("circle")
     .attr("cx", d => xScale(d.income))
     .attr("cy", height - 50)
-    .attr("r", d => {
-      const r = Math.sqrt(d.births) / 200;
-      return (d.country === "Norway" || d.country === "Nigeria") ? Math.max(r, 7) : r;
-    })
+    .attr("r", d => Math.sqrt(d.births) / 200)
     .attr("fill", d => {
       if (d.country === "Nigeria") return "crimson";
-      if (d.country === "Norway") return "#0077FF";
+      if (d.country === "Norway") return "darkblue";
       return "#89CFF0";
     })
     .attr("opacity", 0.8);
 
-// Create tooltip
-const tooltip = d3.select("body")
-  .append("div")
-  .attr("class", "tooltip")
-  .style("position", "absolute")
-  .style("background", "#fff")
-  .style("padding", "8px")
-  .style("border", "1px solid #ccc")
-  .style("border-radius", "4px")
-  .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)")
-  .style("pointer-events", "none")
-  .style("opacity", 0);
-
-// Add tooltip events
-bubbles
-  .on("mouseover", (event, d) => {
-    tooltip.transition().duration(200).style("opacity", 1);
-    tooltip.html(`<strong>${d.country}</strong><br>MMR: ${d.mmr}`)
-      .style("left", (event.pageX + 15) + "px")
-      .style("top", (event.pageY - 28) + "px");
-  })
-  .on("mousemove", event => {
-    tooltip
-      .style("left", (event.pageX + 15) + "px")
-      .style("top", (event.pageY - 28) + "px");
-  })
-  .on("mouseout", () => {
-    tooltip.transition().duration(300).style("opacity", 0);
-  });
-
-
   bubbles.transition()
     .duration(2000)
     .attr("cy", d => yScale(d.mmr))
+    .on("end", function (event, d) {
+      if (d.country === "Nigeria" || d.country === "Norway") {
+        tooltip.transition().duration(200).style("opacity", 1);
+        tooltip.html(`<strong>${d.country}</strong><br>MMR: ${d.mmr}`)
+          .style("left", (xScale(d.income) + 30) + "px")
+          .style("top", (yScale(d.mmr) - 30) + "px");
+      }
+    });
+  // Highlight with flare and annotation for Nigeria and Norway
+  const highlighted = data.filter(d => d.country === "Nigeria" || d.country === "Norway");
 
-
-.on("end", function (event, d) {
-  if (d.country === "Nigeria" || d.country === "Norway") {
+  const flare = svg.selectAll(".flare")
+    .data(highlighted)
+    .enter()
+    .append("circle")
+    .attr("class", "flare")
+    .attr("cx", d => xScale(d.income))
+    .attr("cy", d => yScale(d.mmr))
+    .attr("r", d => Math.sqrt(d.births) / 200 + 6)
+    .style("fill", "none")
+    .style("stroke", d => d.country === "Nigeria" ? "crimson" : "darkblue")
+    .style("stroke-width", 2)
+    .style("stroke-opacity", 0.6)
+    .style("filter", "url(#glow)");
+  // Add annotation arrows and boxes for Nigeria and Norway
+  highlighted.forEach(d => {
     const x = xScale(d.income);
     const y = yScale(d.mmr);
-    const baseColor = d.country === "Nigeria" ? "crimson" : "#1E90FF";
-    const labelColor = d.country === "Nigeria" ? "crimson" : "#003366";
 
-    // Glowing base circle
-    svg.append("circle")
-      .attr("cx", x)
-      .attr("cy", y)
-      .attr("r", Math.max(Math.sqrt(d.births) / 200 + 6, 10))
-      .attr("fill", baseColor)
-      .style("filter", "url(#glow)");
+    // Annotation text
+    const annotationText = `${d.country}: ${d.mmr}`;
 
-    // Flare pulse ring
-    function flare() {
-      const ring = svg.append("circle")
-        .attr("cx", x)
-        .attr("cy", y)
-        .attr("r", 8)
-        .attr("stroke", baseColor)
-        .attr("stroke-width", 2)
-        .attr("fill", "none")
-        .attr("opacity", 0.6);
+    // Create temporary text to measure width
+    const tempText = svg.append("text")
+      .attr("x", -9999)
+      .attr("y", -9999)
+      .style("font-size", "13px")
+      .text(annotationText);
 
-      ring.transition()
-        .duration(1500)
-        .attr("r", 20)
-        .attr("opacity", 0)
-        .remove()
-        .on("end", flare);
-    }
+    const textWidth = tempText.node().getBBox().width;
+    tempText.remove();
 
-    flare();
+    const boxWidth = textWidth + 12;
+    const boxHeight = 22;
+    const offsetX = 20;
+    const offsetY = -30;
 
-    // Fade-in country label
+    // Draw arrow line
+    svg.append("line")
+      .attr("x1", x)
+      .attr("y1", y)
+      .attr("x2", x + offsetX)
+      .attr("y2", y + offsetY + boxHeight / 2)
+      .attr("stroke", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .attr("stroke-width", 1.5)
+      .attr("marker-end", "url(#arrow)");
+
+    // Draw annotation background box
+    svg.append("rect")
+      .attr("x", x + offsetX)
+      .attr("y", y + offsetY)
+      .attr("width", boxWidth)
+      .attr("height", boxHeight)
+      .attr("rx", 6)
+      .attr("ry", 6)
+      .attr("fill", "white")
+      .attr("stroke", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .attr("stroke-width", 1.5)
+      .style("filter", "drop-shadow(0px 1px 3px rgba(0,0,0,0.2))");
+
+    // Add annotation text
     svg.append("text")
-      .attr("x", x)
-      .attr("y", y - 14)
-      .attr("text-anchor", "middle")
+      .attr("x", x + offsetX + 6)
+      .attr("y", y + offsetY + 15)
       .style("font-size", "13px")
       .style("font-weight", "bold")
-      .style("fill", labelColor)
-      .style("opacity", 0)
-      .text(d.country)
-      .transition()
-      .duration(800)
-      .style("opacity", 1);
-  }
-})
+      .style("fill", d.country === "Nigeria" ? "crimson" : "darkblue")
+      .text(annotationText);
+  });
 
-;
-  
+
+  svg.selectAll(".annotation")
+    .data(highlighted)
+    .enter()
+    .append("text")
+    .attr("class", "annotation")
+    .attr("x", d => xScale(d.income) + 12)
+    .attr("y", d => yScale(d.mmr) - 12)
+    .style("font-size", "13px")
+    .style("font-weight", "bold")
+    .style("fill", d => d.country === "Nigeria" ? "crimson" : "darkblue")
+    .text(d => `${d.country}: ${d.mmr}`);
+
+
   // Axis labels
   svg.append("text")
     .attr("x", width / 2)
@@ -175,7 +191,7 @@ bubbles
   xScale.domain().forEach(group => {
     svg.append("text")
       .attr("x", xScale(group))
-      .attr("y", height - 30)
+      .attr("y", height - 55)
       .attr("text-anchor", "middle")
       .style("font-size", "12px")
       .text(group);
@@ -191,7 +207,7 @@ bubbles
   const legendData = [
     { label: "Other Countries", color: "#89CFF0" },
     { label: "Nigeria", color: "crimson" },
-    { label: "Norway", color: "#0077FF" }
+    { label: "Norway", color: "darkblue" }
   ];
 
   svg.selectAll("legend-dots")
