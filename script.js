@@ -1,7 +1,8 @@
+
 let currentScene = 0;
 let data;
 
-const width = 800;
+const width = 600;
 const height = 500;
 const svg = d3.select("#chart");
 
@@ -18,6 +19,7 @@ d3.csv("maternal_mortality_cleaned.csv").then(raw => {
 
 function updateScene() {
   svg.selectAll("*").remove();
+  d3.select("#description").classed("visible", false).html("");
 
   if (currentScene === 0) {
     drawScene1();
@@ -28,16 +30,7 @@ function updateScene() {
   }
 }
 
-
 function drawScene1() {
-  d3.select("#description").html("<h2>Scene 1: Maternal Mortality vs. Income Group</h2>" +
-    "<p>" +
-    "This bubble chart visualizes maternal mortality ratio (MMR) across income groups. " +
-    "Each bubble represents a country, with its size indicating the number of live births. " +
-    "<span style='color:crimson;font-weight:bold;'>Nigeria</span> and " +
-    "<span style='color:green;font-weight:bold;'>Norway</span> are highlighted due to their contrasting MMRs." +
-    "</p>");
-
   const xScale = d3.scalePoint()
     .domain(["Low income", "Lower middle income", "Upper middle income", "High income"])
     .range([100, width - 100]);
@@ -72,7 +65,7 @@ function drawScene1() {
     .attr("opacity", 0.8);
 
   bubbles.transition()
-    .duration(2500)
+    .duration(2000)
     .attr("cy", d => yScale(d.mmr))
     .on("end", function (event, d) {
       if (d.country === "Nigeria" || d.country === "Norway") {
@@ -83,6 +76,7 @@ function drawScene1() {
       }
     });
 
+  // Axis labels
   svg.append("text")
     .attr("x", width / 2)
     .attr("y", height - 10)
@@ -130,6 +124,27 @@ function drawScene1() {
     .text(d => d.label)
     .attr("text-anchor", "start")
     .style("alignment-baseline", "middle");
+
+  // Set description with visible class
+  d3.select("#description")
+    .classed("visible", true)
+    .html(`
+      <h2>Understanding Maternal Mortality & Income</h2>
+      <p>
+        This scene presents a bubble chart showing the <strong>Maternal Mortality Ratio (MMR)</strong> across different <strong>income groups</strong>.
+        Each bubble represents a country, sized by the number of <strong>live births</strong>.
+        Countries like <span style='color:crimson; font-weight:bold;'>Nigeria</span> show high MMR despite many births,
+        while <span style='color:green; font-weight:bold;'>Norway</span> has low MMR, reflecting the disparities in healthcare outcomes.
+      </p>
+    `);
+}
+
+function drawScene2() {
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height / 2)
+    .attr("text-anchor", "middle")
+    .text("Scene 2: Coming Soon");
 }
 
 function drawScene3() {
