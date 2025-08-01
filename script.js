@@ -237,6 +237,7 @@ bubbles
 }
 
 function drawScene2() {
+  
   d3.csv("global_mmr_cleaned.csv").then(raw => {
     const parsedData = raw.map(d => ({
       year: +d.Year,
@@ -262,31 +263,20 @@ function drawScene2() {
 
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const path = g.append("path")
+    g.append("path")
       .datum(parsedData)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
       .attr("stroke-width", 2)
       .attr("d", line);
 
-    // Animate line drawing
-    const totalLength = path.node().getTotalLength();
-    path
-      .attr("stroke-dasharray", `${totalLength} ${totalLength}`)
-      .attr("stroke-dashoffset", totalLength)
-      .transition()
-      .duration(2500)
-      .ease(d3.easeLinear)
-      .attr("stroke-dashoffset", 0);
-
-    // Axes
     g.append("g")
       .attr("transform", `translate(0,${innerHeight})`)
       .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
-    g.append("g").call(d3.axisLeft(y));
+    g.append("g")
+      .call(d3.axisLeft(y));
 
-    // Labels
     svg.append("text")
       .attr("x", margin.left + innerWidth / 2)
       .attr("y", height - 10)
@@ -301,21 +291,22 @@ function drawScene2() {
       .attr("text-anchor", "middle")
       .style("font-weight", "bold")
       .text("Global Maternal Mortality Ratio");
-
-    // Description panel
     d3.select("#description")
       .classed("visible", true)
       .html(`
         <h2>Global Trends in Maternal Mortality</h2>
         <p>
-          Building on Scene 1's view of how income levels affect MMR, this line chart examines global trends over time.
-          Each point represents the average <strong>Maternal Mortality Ratio (MMR)</strong> for a year globally.
+          While Scene 1 illustrated the sharp contrast in maternal mortality across income groups for a single year, 
+          this scene zooms out to examine the <strong>global trend over time</strong>.
+          Tracking the <strong>Maternal Mortality Ratio (MMR)</strong> from 2000 onward, we can see whether 
+          healthcare improvements are reducing maternal deaths worldwide.
         </p>
         <p>
-          As the line draws, notice the <strong>steady decline in MMR</strong> from the year 2000 onwards — a signal of 
-          progress in maternal health, policy interventions, and access to care globally.
+          Encouragingly, the chart shows a general <strong>downward trend</strong>, suggesting that 
+          global efforts in maternal health — including increased access to skilled birth attendants, 
+          emergency obstetric care, and education — are making a measurable impact.
         </p>
-      `);
+    `);
   });
 }
 
