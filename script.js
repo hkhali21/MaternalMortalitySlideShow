@@ -311,139 +311,147 @@ function drawScene2() {
 }
 
 function drawScene3() {
-  d3.select("#controls").remove(); // Remove any existing filter panel
-  d3.select("#sidebar").remove();  // Remove existing sidebar
+  d3.csv("global_mmr_dashboard_ready.csv").then(raw => {
+    const data = raw.map(d => ({
+      Country: d.Country,
+      Region: d.Region,
+      "Income group": d["Income group"],
+      Year: d.Year,
+      MMR: +d.MMR,
+      LiveBirths: +d.LiveBirths
+    }));
 
-  const years = Array.from(new Set(data.map(d => d.Year))).sort((a, b) => +a - +b);
-  const regions = Array.from(new Set(data.map(d => d.Region))).sort();
-  const incomeGroups = Array.from(new Set(data.map(d => d["Income group"]))).sort();
+    // Dropdown filters setup
+    const years = Array.from(new Set(data.map(d => d.Year))).sort();
+    const regions = Array.from(new Set(data.map(d => d.Region))).sort();
+    const incomeGroups = Array.from(new Set(data.map(d => d["Income group"]))).sort();
 
-  // Create control panel
-  const controls = d3.select("body").insert("div", "#chart")
-    .attr("id", "controls")
-    .style("margin-bottom", "20px")
-    .style("display", "flex")
-    .style("gap", "20px")
-    .style("justify-content", "center");
+    d3.select("#controls")?.remove();
+    d3.select("#sidebar")?.remove();
 
-  const dropdown = (label, options, id) => {
-    const div = controls.append("div");
-    div.append("label").text(label + ": ").style("font-weight", "bold");
-    const select = div.append("select").attr("id", id);
-    select.append("option").text("All").attr("value", "");
-    options.forEach(opt => {
-      select.append("option").text(opt).attr("value", opt);
-    });
-  };
+    const controls = d3.select("body").insert("div", "#chart")
+      .attr("id", "controls")
+      .style("margin-bottom", "20px")
+      .style("display", "flex")
+      .style("gap", "20px")
+      .style("justify-content", "center");
 
-  dropdown("Region", regions, "region-filter");
-  dropdown("Income Group", incomeGroups, "income-filter");
-  dropdown("Year", years, "year-filter");
-
-  // Sidebar
-  const sidebar = d3.select("body").append("div")
-    .attr("id", "sidebar")
-    .style("position", "absolute")
-    .style("top", "150px")
-    .style("right", "40px")
-    .style("width", "260px")
-    .style("background", "#f4f4f4")
-    .style("padding", "15px")
-    .style("border-left", "3px solid #3498db")
-    .style("display", "none")
-    .style("font-size", "14px");
-
-  const updateChart = () => {
-    const selectedRegion = d3.select("#region-filter").property("value");
-    const selectedIncome = d3.select("#income-filter").property("value");
-    const selectedYear = d3.select("#year-filter").property("value");
-
-    const filteredData = data.filter(d => {
-      return (!selectedRegion || d.Region === selectedRegion) &&
-             (!selectedIncome || d["Income group"] === selectedIncome) &&
-             (!selectedYear || d.Year === selectedYear);
-    });
-
-    const x = d3.scaleLinear()
-      .domain([0, d3.max(filteredData, d => d.LiveBirths)]).nice()
-      .range([80, width - 100]);
-
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(filteredData, d => d.MMR)]).nice()
-      .range([height - 50, 50]);
-
-    svg.selectAll("*").remove();
-
-    svg.append("g")
-      .attr("transform", `translate(0,${height - 50})`)
-      .call(d3.axisBottom(x));
-
-    svg.append("g")
-      .attr("transform", `translate(80,0)`)
-      .call(d3.axisLeft(y));
-
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", height - 10)
-      .attr("text-anchor", "middle")
-      .text("Live Births");
-
-    svg.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("x", -height / 2)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .style("font-weight", "bold")
-      .text("Maternal Mortality Ratio");
-
-    svg.selectAll("circle")
-      .data(filteredData)
-      .join("circle")
-      .attr("cx", d => x(d.LiveBirths))
-      .attr("cy", d => y(d.MMR))
-      .attr("r", 6)
-      .attr("fill", "#3498db")
-      .attr("opacity", 0.75)
-      .on("mouseover", (event, d) => {
-        d3.select(event.currentTarget).transition().attr("r", 9);
-        tooltip.transition().duration(200).style("opacity", 1);
-        tooltip.html(
-          `<strong>${d.Country}</strong><br>MMR: ${d.MMR}<br>Births: ${d.LiveBirths}<br>${d.Region}<br>${d["Income group"]}<br>${d.Year}`
-        )
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY - 28) + "px");
-      })
-      .on("mouseout", (event, d) => {
-        d3.select(event.currentTarget).transition().attr("r", 6);
-        tooltip.transition().duration(300).style("opacity", 0);
-      })
-      .on("click", (event, d) => {
-        sidebar.style("display", "block").html(`
-          <h3>${d.Country}</h3>
-          <p><strong>Region:</strong> ${d.Region}</p>
-          <p><strong>Income Group:</strong> ${d["Income group"]}</p>
-          <p><strong>MMR:</strong> ${d.MMR}</p>
-          <p><strong>Live Births:</strong> ${d.LiveBirths}</p>
-          <p><strong>Year:</strong> ${d.Year}</p>
-        `);
+    const dropdown = (label, options, id) => {
+      const div = controls.append("div");
+      div.append("label").text(label + ": ").style("font-weight", "bold");
+      const select = div.append("select").attr("id", id);
+      select.append("option").text("All").attr("value", "");
+      options.forEach(opt => {
+        select.append("option").text(opt).attr("value", opt);
       });
-  };
+    };
 
-  // Tooltip
-  const tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("position", "absolute")
-    .style("background", "#fff")
-    .style("padding", "8px")
-    .style("border", "1px solid #ccc")
-    .style("border-radius", "4px")
-    .style("pointer-events", "none")
-    .style("box-shadow", "0 2px 6px rgba(0,0,0,0.2)")
-    .style("opacity", 0);
+    dropdown("Region", regions, "region-filter");
+    dropdown("Income Group", incomeGroups, "income-filter");
+    dropdown("Year", years, "year-filter");
 
-  d3.selectAll("#region-filter, #income-filter, #year-filter").on("change", updateChart);
+    const sidebar = d3.select("body").append("div")
+      .attr("id", "sidebar")
+      .style("position", "absolute")
+      .style("top", "150px")
+      .style("right", "40px")
+      .style("width", "260px")
+      .style("background", "#f4f4f4")
+      .style("padding", "15px")
+      .style("border-left", "3px solid #3498db")
+      .style("display", "none")
+      .style("font-size", "14px");
 
-  updateChart();
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background", "#fff")
+      .style("padding", "8px")
+      .style("border", "1px solid #ccc")
+      .style("border-radius", "4px")
+      .style("pointer-events", "none")
+      .style("box-shadow", "0 2px 6px rgba(0,0,0,0.2)")
+      .style("opacity", 0);
+
+    const updateChart = () => {
+      const selectedRegion = d3.select("#region-filter").property("value");
+      const selectedIncome = d3.select("#income-filter").property("value");
+      const selectedYear = d3.select("#year-filter").property("value");
+
+      const filteredData = data.filter(d => {
+        return (!selectedRegion || d.Region === selectedRegion) &&
+               (!selectedIncome || d["Income group"] === selectedIncome) &&
+               (!selectedYear || d.Year === selectedYear);
+      });
+
+      svg.selectAll("*").remove();
+
+      const x = d3.scaleLinear()
+        .domain([0, d3.max(filteredData, d => d.LiveBirths)]).nice()
+        .range([80, width - 100]);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(filteredData, d => d.MMR)]).nice()
+        .range([height - 50, 50]);
+
+      svg.append("g")
+        .attr("transform", `translate(0,${height - 50})`)
+        .call(d3.axisBottom(x));
+
+      svg.append("g")
+        .attr("transform", `translate(80,0)`)
+        .call(d3.axisLeft(y));
+
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height - 10)
+        .attr("text-anchor", "middle")
+        .text("Live Births");
+
+      svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", 20)
+        .attr("text-anchor", "middle")
+        .style("font-weight", "bold")
+        .text("Maternal Mortality Ratio");
+
+      svg.selectAll("circle")
+        .data(filteredData)
+        .join("circle")
+        .attr("cx", d => x(d.LiveBirths))
+        .attr("cy", d => y(d.MMR))
+        .attr("r", 6)
+        .attr("fill", "#3498db")
+        .attr("opacity", 0.75)
+        .on("mouseover", (event, d) => {
+          d3.select(event.currentTarget).transition().attr("r", 9);
+          tooltip.transition().duration(200).style("opacity", 1);
+          tooltip.html(
+            `<strong>${d.Country}</strong><br>MMR: ${d.MMR}<br>Births: ${d.LiveBirths}<br>${d.Region}<br>${d["Income group"]}<br>${d.Year}`
+          )
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", (event, d) => {
+          d3.select(event.currentTarget).transition().attr("r", 6);
+          tooltip.transition().duration(300).style("opacity", 0);
+        })
+        .on("click", (event, d) => {
+          sidebar.style("display", "block").html(`
+            <h3>${d.Country}</h3>
+            <p><strong>Region:</strong> ${d.Region}</p>
+            <p><strong>Income Group:</strong> ${d["Income group"]}</p>
+            <p><strong>MMR:</strong> ${d.MMR}</p>
+            <p><strong>Live Births:</strong> ${d.LiveBirths}</p>
+            <p><strong>Year:</strong> ${d.Year}</p>
+          `);
+        });
+    };
+
+    d3.selectAll("#region-filter, #income-filter, #year-filter").on("change", updateChart);
+    updateChart();
+  });
 }
 
 d3.select("#next").on("click", () => {
