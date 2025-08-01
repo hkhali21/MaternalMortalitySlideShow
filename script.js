@@ -311,6 +311,14 @@ function drawScene2() {
 }
 
 function drawScene3() {
+  d3.select("#description")
+    .classed("visible", true)
+    .html(`
+      <h2>Country Comparison</h2>
+      <p>This scene compares selected countries (<strong>Nigeria</strong>, <strong>Norway</strong>, <strong>India</strong>, <strong>Afghanistan</strong>) in terms of their 
+      <strong>Maternal Mortality Ratio (MMR)</strong>. The height of the bars shows how drastically outcomes vary between high- and low-income countries.</p>
+    `);
+
   const highlight = ["Afghanistan", "Norway", "Nigeria", "India"];
   const filtered = data.filter(d => highlight.includes(d.country));
 
@@ -323,6 +331,31 @@ function drawScene3() {
     .domain([0, d3.max(filtered, d => d.mmr)]).nice()
     .range([height - 50, 50]);
 
+  // Axes
+  svg.append("g")
+    .attr("transform", `translate(0,${height - 50})`)
+    .call(d3.axisBottom(x));
+
+  svg.append("g")
+    .attr("transform", `translate(100,0)`)
+    .call(d3.axisLeft(y));
+
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", 20)
+    .attr("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .text("Scene 3: MMR Comparison");
+
+  svg.append("text")
+    .attr("x", -height / 2)
+    .attr("y", 20)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .text("Maternal Mortality Ratio (MMR)");
+
+  // Bars
   svg.selectAll("rect")
     .data(filtered)
     .join("rect")
@@ -330,15 +363,17 @@ function drawScene3() {
     .attr("y", d => y(d.mmr))
     .attr("width", x.bandwidth())
     .attr("height", d => height - 50 - y(d.mmr))
-    .attr("fill", "crimson");
+    .attr("fill", "steelblue");
 
+  // Labels
   svg.selectAll("text.label")
     .data(filtered)
     .join("text")
     .attr("x", d => x(d.country) + x.bandwidth() / 2)
     .attr("y", d => y(d.mmr) - 5)
     .attr("text-anchor", "middle")
-    .text(d => `${d.country}: ${(d.mmr * 100000).toFixed(0)}`);
+    .style("font-size", "12px")
+    .text(d => `${d.mmr}`);
 }
 
 d3.select("#next").on("click", () => {
