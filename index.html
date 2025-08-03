@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,25 +5,309 @@
   <title>Maternal Mortality & Poverty</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/topojson.v3.min.js"></script>
 </head>
 <body>
+  <h1>Maternal Mortality and Poverty</h1>
 
+  <p id="scene3-instructions" style="display: none; font-size: 16px; margin-top: 10px;">
+  📍 Click on a region to explore maternal mortality rates (MMR) and view a list of countries.<br>
+  🟢 Then click on a country below the chart to view a detailed chart and statistics.
+</p>
+
+  <div class="nav-buttons">
+    <button id="prev" class="nav-btn">⟵ Back</button>
+    <button id="next" class="nav-btn">Next ⟶</button>
+  </div>
+
+  <div class="viz-container" style="display: none;">
+  <svg id="chart" width="600" height="500" style="display: none;"></svg>
+  <div id="description" class="description-box" style="display: none;"></div>
+</div>
+
+<svg id="map" width="700" height="400" style="display: none;"></svg>
+</div>
+<div id="region-legend" style="display: none;" class="region-legend-box"></div> -->
+<div id="scene3-wrapper" style="display: none; position: relative; display: flex; justify-content: center;">
+  <div id="map-wrapper">
+    <svg id="map" width="700" height="400"></svg>
+  </div>
+  <div id="region-legend" class="region-legend-box"></div>
+</div>
+
+<div id="region-info" style="display: none;"></div>
+
+
+<div id="country-detail" style="display: none; justify-content: space-between; align-items: flex-start; gap: 20px;">
+  
+  <!-- LEFT: Country text -->
+  <div id="country-text" style="flex: 1; min-width: 300px;">
+    <h2 id="country-title"></h2>
+    <p id="country-description"></p>
+    <p id="bubble-insight" style="font-weight: bold;"></p>
+  </div>
+  
+  <!-- RIGHT: Bubble + Bar Chart vertically stacked -->
+  <div id="charts-container" style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+    <svg id="bubble-svg" width="400" height="300"></svg> <!-- Bubble chart on top -->
+    <svg id="bubble-chart" width="400" height="300" style="margin-top: 20px;"></svg> <!-- Bar chart under -->
+  </div>
 
 </div>
 
-<h1>Maternal Mortality and Poverty</h1>
 
-<div class="nav-buttons">
-  <button id="prev" class="nav-btn">⟵ Back</button>
-  <button id="next" class="nav-btn">Next ⟶</button>
+<!-- Scene 4 -->
+<!-- <div id="scene4" class="scene" style="display: none;">
+  <h2 class="scene-title">Faces Behind the Numbers</h2>
+  <div id="family-container">
+    <!-- Portraits will be inserted here -->
+  <!-- </div>
+  <div id="family-detail" style="display: none;">
+    <button id="close-detail">⬅ Back</button>
+    <div id="detail-content"></div>
+  </div>
+</div> --> 
+<!-- <div id="scene4" class="scene" style="display: none;">
+  <h2>Stories from Families Affected by Maternal Mortality</h2>
+  <div id="family-container"></div>
+
+  <div id="family-detail" style="display:none;">
+    <button id="close-detail">← Back</button>
+    <div id="detail-content"></div>
+  </div>
+</div> -->
+<!-- SCENE 4 -->
+<div id="scene4" class="scene">
+  <h2>Stories Behind the Numbers</h2>
+  <h2>Real Lives, Real Loss: Stories of Mothers Lost to Poverty and Poor Access</h2>
+
+  <div class="family-gallery">
+    <div class="family-card" data-story-id="story-amina">
+      <img src="images/amina.jpg" alt="Amina Yusuf" />
+      <p>Amina Yusuf</p>
+    </div>
+    <div class="family-card" data-story-id="story-lalita">
+      <img src="images/lalita.jpg" alt="Lalita Devi" />
+      <p>Lalita Devi</p>
+    </div>
+    <div class="family-card" data-story-id="story-josefa">
+      <img src="images/josefa.jpg" alt="Josefa Morales" />
+      <p>Josefa Morales</p>
+    </div>
+    <div class="family-card" data-story-id="story-zahra">
+      <img src="images/zahra.jpg" alt="Zahra Al-Mansoori" />
+      <p>Zahra Al-Mansoori</p>
+    </div>
+    <div class="family-card" data-story-id="story-nyamal">
+      <img src="images/nyamal.jpg" alt="Nyamal Deng" />
+      <p>Nyamal Deng</p>
+    </div>
+    <div class="family-card" data-story-id="story-maria">
+      <img src="images/maria.jpg" alt="María Luz Ortega" />
+      <p>María Luz Ortega</p>
+    </div>
+  </div>
+
+  <!-- Family Story Containers -->
+  <!-- Amina Yusuf -->
+<div class="story-container" id="story-amina" style="display: none;">
+  <div class="story-card">
+    <img src="images/amina.jpg" class="story-image" />
+    <div class="story-details">
+      <h2>Amina Yusuf</h2>
+      <h4>Somalia – Sub-Saharan Africa</h4>
+      <p>
+        Amina died after giving birth in a remote village with no skilled health workers nearby. The nearest clinic was over 40 kilometers away. Her family couldn’t afford transportation, and she died from postpartum hemorrhage hours later.Her children were left without care, and her husband quit work, pushing them into deeper poverty
+      </p>
+      <img src="images/somalia_chart.png" class="story-chart" />
+      <ul class="story-bullets">
+        <li>Only 9% of births attended by skilled personnel</li>
+        <li>Transport access extremely limited</li>
+        <li>High maternal mortality due to delays</li>
+      </ul>
+      <img src="images/clinic_distance_chart.png" class="story-chart" alt="Clinic Distance Chart in Somalia" />
+
+<p style="margin-top: 15px; font-size: 16px;">
+  <strong>What this shows:</strong> In rural Somalia, the poorest families (10th percentile) live around <strong>5 km</strong> from the nearest clinic.
+  But for the 90th percentile — those in the most remote areas — the distance is a staggering <strong>70 km</strong>.
+  These long distances make it nearly impossible to access skilled care during emergencies like childbirth.This is a key factor in stories like Amina Yusuf’s.
+</p>
+    </div>
+  </div>
+</div>
+
+<!-- Lalita Devi -->
+<div class="story-container" id="story-lalita" style="display: none;">
+  <div class="story-card">
+    <img src="images/lalita.jpg" class="story-image" />
+    <div class="story-details">
+      <h2>Lalita Devi</h2>
+      <h4>Nepal – South Asia</h4>
+      <p>
+        Lalita, a first-time mother from a remote mountainous village, Died from eclampsia due to untreated high blood pressure and malnutrition. Family couldn't afford prenatal care.Her daughter dropped out of school to care for younger siblings. For Lalita Devi, who lived in the remote western hills of Nepal, the above map reflects the deadly reality she and thousands of women face
+      <img src="images/nepal_map_access.png" class="story-chart" />
+      <ul class="story-bullets">
+        <li>Dark green areas (like where Lalita lived) mean very poor access — in some districts, less than 10% of rural people can reach a town within an hour.</li>
+        <li>In these places, there are few roads, no ambulances, and walking is often the only option — even in medical emergencies.</li>
+        <li> Lighter green areas (eastern Nepal) have better roads and transport, but they’re still exceptions.</li>
+      </ul>
+      <p style="margin-top: 15px; font-size: 16px;""><strong>What this shows For Lalita:</strong></p>
+       <ul class="story-bullets">
+        <li>Long distance to healthcare facility</li>
+        <li>No prenatal care due to poverty</li>
+        <li>Died from untreated complications</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
 
-<div class="viz-container">
-  <svg id="chart" width="600" height="500"></svg>
-  <div id="description" class="description-box"></div>
+<!-- Josefa Morales -->
+<div class="story-container" id="story-josefa" style="display: none;">
+  <div class="story-card">
+    <img src="images/josefa.jpg" class="story-image" />
+    <div class="story-details">
+      <h2>Josefa Morales</h2>
+      <h4>Haiti – Latin America & Caribbean</h4>
+      <p>
+        Josefa gave birth at home because the nearby clinic lacked staff. She died three days later from a postpartum infection that went untreated due to lack of access and money.Her youngest child became severely malnourished and had to be placed in an orphanage.
+      </p>
+      <img src="images/haiti_facility_access.png" class="story-chart" alt="Haiti Health Facility Access Map" />
+
+<p style="margin-top: 15px; font-size: 16px;">
+  The image above shows how close (or far) people in Haiti live from a health facility. For women like <strong>Josefa Morales</strong>, this map isn’t abstract — it’s personal.
+</p>
+<p style="font-size: 16px;">
+  <span style="color: darkred; font-weight: bold;">Red</span> and <span style="color: orange; font-weight: bold;">dark orange</span> zones show areas where travel time to a health center exceeds 1–2 hours, often on foot. Josefa lived in a rural commune outside Les Cayes, in one of these underserved zones.
+</p>
+<p style="font-size: 16px;">
+  When she went into labor, there was no clinic nearby, and the only vehicle in her village had broken down months earlier. Her husband tried carrying her down the hill toward the main road, but by the time they found a motorbike, Josefa had already lost too much blood.
+</p>
+<p style="font-size: 16px;">
+  This map tells a hidden truth: in Haiti, nearly <strong>40% of rural residents</strong> live more than <strong>5 km</strong> from the nearest health facility, often without reliable transpo
+
+      <img src="images/chart-placeholder3.png" class="story-chart" alt="Chart: Health Infrastructure in Rural Haiti" />
+
+<p style="margin-top: 15px; font-size: 16px;">
+  Here's the bar chart showing the <strong>health infrastructure in rural Haiti</strong> — supporting Josefa Morales' story:
+</p>
+<ul class="story-bullets">
+  <li>Only <strong>27%</strong> of rural facilities have skilled birth attendants.</li>
+  <li>Just <strong>12%</strong> offer emergency transport.</li>
+  <li>Fewer than <strong>1 in 5</strong> operate 24/7.</li>
+</ul>
+<p style="font-size: 16px;">
+  This illustrates the <strong>deadly gaps</strong> Josefa faced in reaching lifesaving maternal care.
+</p>
+
+    </div>
+  </div>
 </div>
 
-<script src="script.js"></script>
+<!-- Zahra Al-Mansoori -->
+<div class="story-container" id="story-zahra" style="display: none;">
+  <div class="story-card">
+    <img src="images/zahra.jpg" class="story-image" />
+    <div class="story-details">
+      <h2>Zahra Al-Mansoori</h2>
+      <h4>Yemen – Middle East & North Africa</h4>
+      <p>
+        Zahra bled to death at home because the family couldn’t afford transportation to a hospital 80 km away.
+    Her sister was forced into early marriage due to economic hardship.</p>
+      <img src="images/yemen_transport_gap.png" class="story-chart" alt="Yemen Transportation and Maternal Care Gaps" />
+
+<p style="margin-top: 15px; font-size: 16px;">
+  This chart helps contextualize <strong>Zahra Al-Mansoori's</strong> story — where lack of timely care and emergency access led to her <strong>preventable death</strong>.
+</p>
+<ul class="story-bullets">
+  <li><strong>Only 9%</strong> of rural areas have reliable <strong>Transport Access</strong> to health facilities.</li>
+  <li><strong>Just 11%</strong> have <strong>Emergency Obstetric Care</strong>, essential for saving mothers' lives.</li>
+  <li><strong>Only 24%</strong> of births are attended by skilled professionals.</li>
+  <li><strong>Only 17%</strong> of clinics operate <strong>24/7</strong>.</li>
+</ul>
+<p style="font-size: 16px;">
+  These statistics reveal the severe breakdown in maternal health infrastructure that ultimately cost Zahra her life.
+</p>
+
+    </div>
+  </div>
+</div>
+
+<!-- Nyamal Deng -->
+<div class="story-container" id="story-nyamal" style="display: none;">
+  <div class="story-card">
+    <img src="images/nyamal.jpg" class="story-image" />
+    <div class="story-details">
+      <h2>Nyamal Deng</h2>
+      <h4>South Sudan – Sub-Saharan Africa</h4>
+      <p>
+        Nyamal lived in a displacement camp with no skilled attendants. Malnourished and anemic, she died while giving birth under a tree shelter, far from medical help.Her death led to two of her children being separated and placed with different relatives
+      </p>
+      <img src="images/southsudan_refugee_maternal.png" class="story-chart" alt="Maternal Risk in South Sudan Displacement Camps" />
+
+<p style="margin-top: 15px; font-size: 16px;">
+  This chart shows the dangerously high maternal mortality risks for women living in <strong>South Sudan’s displacement camps</strong> — exactly the kind of conditions Nyamal Deng endured.
+</p>
+<p style="font-size: 16px;">
+  In camps where women often give birth without clean water, electricity, or antibiotics, maternal deaths are tragically common. These makeshift shelters lack trained staff, emergency transport, and infection control — all of which are essential for surviving childbirth complications like the sepsis that killed Nyamal.
+</p>
+<p style="font-size: 16px;">
+  <strong>Nyamal didn't die from an incurable condition.</strong> She died because the health system around her was broken. This chart illustrates how women in refugee settings face up to <strong>10x higher mortality</strong> than those in stable regions.
+</p>
+<img src="images/chart-placeholde5.png" class="story-chart" alt="Maternal Mortality in South Sudan Displacement Camps" />
+
+<p style="margin-top: 15px; font-size: 16px;">
+  Here is the bar chart titled <strong>"Maternal Mortality in South Sudan Displacement Camps"</strong>. It shows <strong>alarming mortality rates</strong> across camps:
+</p>
+<ul class="story-bullets">
+  <li><strong>Malakal:</strong> 1120 deaths per 100,000 live births</li>
+  <li><strong>Bor:</strong> 1050</li>
+  <li><strong>Bentiu:</strong> 990</li>
+  <li><strong>Juba (UN House):</strong> 890</li>
+  <li><strong>Wau:</strong> 870</li>
+</ul>
+<p style="font-size: 16px;">
+  These figures highlight the <strong>critical health gaps</strong> faced by women like Nyamal Deng — where giving birth in a camp meant risking your life due to lack of basic maternal care.
+</p>
+
+
+    </div>
+  </div>
+</div>
+
+<!-- María Luz Ortega -->
+<div class="story-container" id="story-maria" style="display: none;">
+  <div class="story-card">
+    <img src="images/maria.jpg" class="story-image" />
+    <div class="story-details">
+      <h2>María Luz Ortega</h2>
+      <h4>Nicaragua – Latin America & Caribbean</h4>
+      <p>
+        María died from a ruptured uterus after multiple pregnancies with no access to family planning or emergency care.
+        Her teenage son left school to become the sole earner.</p>
+      </p>
+      <div class="animated-chart">
+  <img src="images/nicaragua_fertility_chart.png" class="story-chart" alt="Fertility and Maternal Care Gaps in Nicaragua" />
+  <p style="margin-top: 15px; font-size: 16px;">
+    <strong>"Fertility and Maternal Care Gaps in Nicaragua"</strong> — this chart highlights how regions like the <strong>North Atlantic</strong>, where María lived, face a deadly combination of <strong>high fertility rates</strong> and <strong>poor access to maternal care</strong>.
+  </p>
+  <p style="font-size: 16px;">
+    While the Pacific region averages <strong>
+
+    </div>
+  </div>
+  </div>
+
+
+</div>
+<p style="font-size: 12px; color: #777; margin-top: 30px;">
+  <em>Note: All images shown are placeholders used for illustrative purposes only.These are free images from community taken from https://unsplash.com/about</em>
+</p>
+
+</div>
+
+  <script src="script.js"></script>
 </body>
 </html>
