@@ -1138,6 +1138,19 @@ function drawScene4() {
 
   // Show Scene 4
   d3.selectAll('.scene').style('display', 'none');
+
+
+  d3.select(".viz-container").style("display", "none");
+  d3.select("#chart").style("display", "none");
+  d3.select("#description").style("display", "none");
+  d3.select("#scene3-wrapper").style("display", "none");
+  d3.select("#region-info").style("display", "none");
+  d3.select("#country-detail").style("display", "none");
+
+  // ✅ Hide all story containers
+  document.querySelectorAll('.story-container').forEach(el => {
+    el.style.display = 'none';
+  });
   d3.select('#scene4').style('display', 'block');
 
   // Clear and render cards
