@@ -32,7 +32,7 @@ function updateScene() {
   } else if (currentScene === 2) {
     drawScene3();
   } else if (currentScene === 3) {
-    drawScene4();
+    drawScene4(); // 
   }
 }
 
@@ -245,7 +245,7 @@ bubbles
     .style("font-size", "14px")
     .style("font-weight", "bold")
     .text("Maternal Mortality Ratio (MMR)");
-
+// Set description with visible class
   d3.select("#description")
     .classed("visible", true)
     .html(`
@@ -374,7 +374,7 @@ function clearScene() {
   d3.selectAll("svg").remove();
 
   //  clear any other chart containers
-  d3.selectAll(".chart").html("");  // if your visuals are inside <div class="chart">
+  d3.selectAll(".chart").html("");  // 
 
   // Clear any explanation text or dynamic HTML elements
   d3.selectAll(".explanation").html("");
@@ -476,7 +476,7 @@ const svg = d3.select("#map");
 
 
 
-  // Show region legend only in Scene 3
+  //  region legend only in Scene 3
 const regionLegend = d3.select("#region-legend");
 regionLegend.style("display", "block").html(""); // Clear before adding
 
@@ -742,7 +742,7 @@ function showRegionIncomeGroupBarChart(region) {
     }));
 
   const svg = d3.select("#bubble-chart");
-  svg.selectAll("*").remove();  
+  svg.selectAll("*").remove();  // 
 
   const margin = { top: 40, right: 20, bottom: 40, left: 60 };
   const width = +svg.attr("width") - margin.left - margin.right;
@@ -799,7 +799,7 @@ function showRegionIncomeGroupBarChart(region) {
     .attr("y", d => y(d.avgMMR))
     .attr("height", d => height - y(d.avgMMR));
 
-  // ✅ Add legend AFTER svg is cleared
+  // 
   // const legend = svg.append("g")
   //   .attr("transform", `translate(${margin.left}, 10)`);
 
@@ -1054,6 +1054,77 @@ This illustrates the risks faced by women like María Luz Ortega in underserved 
   }
 ];
 
+// function drawScene4() {
+//   d3.select(".viz-container").style("display", "none");
+//   d3.select("#description").style("display", "none");
+
+//   d3.select("#map").style("display", "none");
+//   d3.select("#region-info").style("display", "none");
+
+
+//   d3.select("#chart").style("display", "none");
+
+//   d3.select("#country-detail").style("display", "none");
+
+
+
+
+//   // d3.select("#map").style("display", "block");
+//  d3.select("#map-wrapper")
+//   .style("display", "none");
+
+  
+
+
+//   d3.selectAll('.scene').style('display', 'none');
+//   d3.select('#scene4').style('display', 'block');
+
+//   const grid = d3.select("#family-container");
+//   grid.html(""); // Clear previous
+
+//   families.forEach((fam, i) => {
+//     const card = grid.append("div")
+//       .attr("class", "family-card")
+//       .on("click", () => showFamilyDetail(fam));
+
+//     card.append("img").attr("src", fam.image);
+//     card.append("p").text(fam.name);
+//   });
+
+//   // Close detail view
+//   d3.select("#close-detail").on("click", () => {
+//     d3.select("#family-detail").style("display", "none");
+//     d3.select("#family-container").style("display", "flex");
+//   });
+// }
+
+// function showFamilyDetail(family) {
+//   d3.select("#family-detail").style("display", "block");
+//   d3.select("#family-container").style("display", "none");
+//   d3.select("#detail-content").html(family.story);
+// }
+
+
+
+// d3.select("#next").on("click", () => {
+//   currentScene = (currentScene + 1) % 3;
+//   updateScene();
+// });
+// d3.select("#next").on("click", () => {
+//   currentScene = (currentScene + 1) % 4;  // Now cycles through 0,1,2,3
+//   updateScene();
+// });
+
+
+// // d3.select("#prev").on("click", () => {
+// //   currentScene = (currentScene - 1 + 3) % 3;
+// //   updateScene();
+// // });
+// d3.select("#prev").on("click", () => {
+//   currentScene = (currentScene - 1 + 4) % 4;  // Wraps correctly from 0 → 3
+//   updateScene();
+// });
+
 function drawScene4() {
   // Hide everything else
     d3.select("#region-info").classed("visible", false).style("display", "none");
@@ -1087,7 +1158,7 @@ function drawScene4() {
   //     .text(fam.name);
   // });
 
-  // // Handle  the detail view
+  // // Handle closing the detail view
   // d3.select("#close-detail").on("click", () => {
   //   d3.select("#family-detail").style("display", "none");
   //   d3.select("#family-container").style("display", "flex");
