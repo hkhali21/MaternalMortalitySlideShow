@@ -256,6 +256,7 @@ bubbles
         Countries like <span style='color:crimson; font-weight:bold;'>Nigeria</span> show high MMR despite many births,
         while <span style='color:darkblue; font-weight:bold;'>Norway</span> has low MMR, reflecting the disparities in healthcare outcomes.
       </p>
+      <p style="color: blue;"><strong>Hover over the bubbles on chart to explore different countries MMR.</strong></p>
     `);
 }
 
